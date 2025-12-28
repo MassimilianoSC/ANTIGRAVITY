@@ -269,14 +269,28 @@ def format_excel_date(value: str) -> str:
         if 1 <= serial <= 60000:
             from datetime import datetime, timedelta
             
+            # Separa parte intera (giorni) e decimale (frazione di giorno = ora)
+            days = int(serial)
+            time_fraction = serial - days
+            
             # Excel considera erroneamente il 1900 come bisestile
-            if serial > 59:
-                serial -= 1
+            if days > 59:
+                days -= 1
             
             base_date = datetime(1899, 12, 30)
-            excel_date = base_date + timedelta(days=serial)
+            excel_date = base_date + timedelta(days=days)
             
-            return excel_date.strftime("%d/%m/%Y")
+            # Aggiungi la componente temporale se presente
+            if time_fraction > 0:
+                excel_date += timedelta(days=time_fraction)
+            
+            # Formatta in base alla presenza di orario
+            # Se ora è 00:00:00 => solo data
+            if excel_date.hour == 0 and excel_date.minute == 0 and excel_date.second == 0:
+                return excel_date.strftime("%d/%m/%Y")
+            else:
+                # Include ora e minuti (senza secondi)
+                return excel_date.strftime("%d/%m/%Y %H:%M")
         else:
             return value
     except (ValueError, TypeError, OverflowError):
