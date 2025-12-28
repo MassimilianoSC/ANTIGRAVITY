@@ -73,6 +73,7 @@ export const getSheetPreview = async (
         colStart?: number;
         colEnd?: number;
         candidate?: number;
+        rawValues?: boolean;
     } = {}
 ): Promise<GridPreview | TablePreview> => {
     const params: any = { mode };
@@ -84,6 +85,9 @@ export const getSheetPreview = async (
         params.col_end = options.colEnd || 20;
     } else {
         params.candidate = options.candidate || 0;
+        if (options.rawValues !== undefined) {
+            params.raw_values = options.rawValues;
+        }
     }
 
     const response = await api.get(`/datasets/${datasetId}/sheets/${encodeURIComponent(sheetName)}/preview`, { params });

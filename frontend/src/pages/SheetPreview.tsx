@@ -11,6 +11,7 @@ export default function SheetPreview() {
     const [candidateIdx, setCandidateIdx] = useState(0);
     const [rowRange, setRowRange] = useState({ start: 1, end: 50 });
     const [colRange, setColRange] = useState({ start: 1, end: 20 });
+    const [rawValues, setRawValues] = useState(false);
 
     const { data: detailData } = useQuery({
         queryKey: ['dataset', id],
@@ -19,7 +20,7 @@ export default function SheetPreview() {
     });
 
     const { data: previewData, isLoading } = useQuery({
-        queryKey: ['preview', id, sheetName, viewMode, candidateIdx, rowRange, colRange],
+        queryKey: ['preview', id, sheetName, viewMode, candidateIdx, rowRange, colRange, rawValues],
         queryFn: () => {
             if (viewMode === 'grid') {
                 return getSheetPreview(id!, sheetName!, 'grid', {
@@ -29,7 +30,10 @@ export default function SheetPreview() {
                     colEnd: colRange.end,
                 });
             } else {
-                return getSheetPreview(id!, sheetName!, 'table', { candidate: candidateIdx });
+                return getSheetPreview(id!, sheetName!, 'table', {
+                    candidate: candidateIdx,
+                    rawValues: rawValues
+                });
             }
         },
         enabled: !!id && !!sheetName,
@@ -103,6 +107,20 @@ export default function SheetPreview() {
                                     </option>
                                 ))}
                             </select>
+                        </div>
+                    )}
+
+                    {viewMode === 'table' && (
+                        <div className="flex items-center gap-2">
+                            <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    checked={rawValues}
+                                    onChange={(e) => setRawValues(e.target.checked)}
+                                    className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                />
+                                Mostra valori grezzi
+                            </label>
                         </div>
                     )}
 

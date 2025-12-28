@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     container_name: excel-importer-backend
     ports:
-      - "8000:8000"
+      - "8082:8000"
     volumes:
       - ./backend/storage:/app/storage
     environment:

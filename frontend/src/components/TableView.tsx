@@ -18,19 +18,24 @@ export default function TableView({ data }: TableViewProps) {
 
     return (
         <div>
-            <div className="mb-4 flex items-center gap-4">
-                <span className="text-sm text-gray-700 font-medium">Confidenza analisi:</span>
-                <span
-                    className={`px-3 py-1 rounded-full text-xs font-medium ${confidence === 'high'
-                            ? 'bg-green-100 text-green-800'
-                            : confidence === 'medium'
-                                ? 'bg-blue-100 text-blue-800'
-                                : 'bg-yellow-100 text-yellow-800'
-                        }`}
-                >
-                    {confidence === 'high' ? 'Alta' : confidence === 'medium' ? 'Media' : 'Bassa'}
-                    ({Math.round(score * 100)}%)
-                </span>
+            <div className="mb-4 flex flex-wrap items-center gap-4">
+                <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-700 font-medium">Confidenza analisi:</span>
+                    <span
+                        className={`px-3 py-1 rounded-full text-xs font-medium ${confidence === 'high'
+                                ? 'bg-green-100 text-green-800'
+                                : confidence === 'medium'
+                                    ? 'bg-blue-100 text-blue-800'
+                                    : 'bg-yellow-100 text-yellow-800'
+                            }`}
+                    >
+                        {confidence === 'high' ? 'Alta' : confidence === 'medium' ? 'Media' : 'Bassa'}
+                        ({Math.round(score * 100)}%)
+                    </span>
+                </div>
+                <div className="text-xs text-gray-500">
+                    💡 Colonne con "DATA" nell'header mostrano date formattate (se non grezze)
+                </div>
             </div>
 
             <div className="overflow-auto max-h-[600px]">

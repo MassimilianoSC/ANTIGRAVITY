@@ -26,8 +26,8 @@ docker compose up --build
 
 **URL di accesso:**
 - Frontend: http://localhost:5173
-- Backend API: http://localhost:8000
-- Documentazione API: http://localhost:8000/docs
+- Backend API: http://localhost:8082
+- Documentazione API: http://localhost:8082/docs
 
 ## Sviluppo Locale (senza Docker)
 

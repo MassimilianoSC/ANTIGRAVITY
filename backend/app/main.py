@@ -131,6 +131,7 @@ async def preview_sheet(
     col_start: int = Query(1, ge=1),
     col_end: int = Query(20, ge=1),
     candidate: int = Query(0, ge=0),
+    raw_values: bool = Query(False),
     db: Session = Depends(get_db)
 ):
     """Preview foglio in modalità grid o table."""
@@ -146,5 +147,5 @@ async def preview_sheet(
         )
     else:  # table
         return crud.get_table_preview(
-            db, dataset_id, sheet_name, candidate
+            db, dataset_id, sheet_name, candidate, raw_values
         )

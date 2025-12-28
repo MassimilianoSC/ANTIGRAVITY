@@ -177,7 +177,8 @@ def get_table_preview(
     db: Session,
     dataset_id: str,
     sheet_name: str,
-    candidate_idx: int = 0
+    candidate_idx: int = 0,
+    raw_values: bool = False
 ) -> Dict[str, Any]:
     """Restituisce preview in modalità tabella."""
     
@@ -225,17 +226,28 @@ def get_table_preview(
     
     # Estrai headers
     headers = []
-    for col in range(col_start, col_end + 1):
+    date_columns = []  # Indici colonne che contengono "DATA" nell'header
+    for col_idx, col in enumerate(range(col_start, col_end + 1)):
         header_val = cell_map.get((header_row, col), f"Col{col}")
         headers.append(header_val)
+        # Rileva colonne data
+        if "DATA" in header_val.upper():
+            date_columns.append(col_idx)
     
     # Estrai righe dati (fino a 50)
     rows = []
     data_start_row = header_row + 1
     for row in range(data_start_row, min(data_start_row + 50, row_end + 1)):
         row_data = []
-        for col in range(col_start, col_end + 1):
-            row_data.append(cell_map.get((row, col), ""))
+        for col_idx, col in enumerate(range(col_start, col_end + 1)):
+            value = cell_map.get((row, col), "")
+            
+            # Formatta date se richiesto e se la colonna è una colonna data
+            if not raw_values and col_idx in date_columns and value:
+                formatted_value = format_excel_date(value)
+                row_data.append(formatted_value)
+            else:
+                row_data.append(value)
         rows.append(row_data)
     
     return {
@@ -245,3 +257,28 @@ def get_table_preview(
         "confidence": candidate.get("confidence", "low"),
         "score": candidate.get("score", 0.0)
     }
+
+def format_excel_date(value: str) -> str:
+    """Converte seriale Excel in data dd/mm/yyyy se possibile."""
+    try:
+        # Prova a convertire in numero
+        serial = float(value)
+        
+        # Excel date serials: giorni dal 1900-01-01
+        # Valori ragionevoli: tra 1 (1900) e 60000 (circa anno 2064)
+        if 1 <= serial <= 60000:
+            from datetime import datetime, timedelta
+            
+            # Excel considera erroneamente il 1900 come bisestile
+            if serial > 59:
+                serial -= 1
+            
+            base_date = datetime(1899, 12, 30)
+            excel_date = base_date + timedelta(days=serial)
+            
+            return excel_date.strftime("%d/%m/%Y")
+        else:
+            return value
+    except (ValueError, TypeError, OverflowError):
+        # Non è un numero o non può essere convertito
+        return value
